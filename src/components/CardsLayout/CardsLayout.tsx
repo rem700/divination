@@ -1,8 +1,13 @@
-import React from 'react'
+import Card from '../Card/Card'
+import styles from './CardsLayout.module.css'
 
 function CardsLayout() {
   return (
-    <div>CardsLayout</div>
+    <div className={styles.cardsLayout}>
+        <Card />
+        <Card />
+        <Card />
+    </div>
   )
 }
 

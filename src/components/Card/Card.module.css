@@ -1,0 +1,11 @@
+.card{
+    width: 100px;
+    position: relative;
+    height: 165px;
+}
+
+.card img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
