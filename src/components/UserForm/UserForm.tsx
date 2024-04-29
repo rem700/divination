@@ -2,15 +2,21 @@ import { useState } from "react";
 import styles from './UserForm.module.css'
 import CardsLayout from "../CardsLayout/CardsLayout";
 import DivinationText from "../DivinationText/DivinationText";
+import useData from "./data/useData";
+import getRandomCards from "../../utils/getRandomCards";
+import TarotCard from "../../types/tarotCard";
 
 
 function UserForm() {
+    const {tarotCards} = useData();
     const [formData, setFormData] = useState({
         name: '',
         age: '',
         gender: '',
         issue: ''
     });
+    const [selectedCards, setSelectedCards] = useState<TarotCard[]>([])
+    const [divination, setDivination] = useState<string>('');
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -20,9 +26,27 @@ function UserForm() {
         }));
     };
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
-        console.log('Submitted Data:', formData);
+        const cards = getRandomCards(tarotCards, 3);
+        setSelectedCards(cards);
+        const inputText = `${formData.name} ${formData.age} ${formData.issue} ${cards.map(card => card.name).join(', ')}`;
+        
+        
+        try {
+            const response = await fetch('/generate-prediction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: inputText })
+            });
+            const data = await response.json();
+            setDivination(data.prediction); // Обновление состояния с предсказанием
+        } catch (error) {
+            console.error('Error fetching prediction:', error);
+            setDivination("Ошибка при получении предсказания.");
+        }
     };
 
     return (
@@ -48,7 +72,7 @@ function UserForm() {
                 </div>
             </div>
             <div className={styles.formCenter}>
-                <CardsLayout />
+                <CardsLayout selectedCards={selectedCards}/>
                 <DivinationText />
                 <button type="submit">Submit</button>
             </div>
